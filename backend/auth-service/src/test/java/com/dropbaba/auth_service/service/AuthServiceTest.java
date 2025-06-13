@@ -2,6 +2,7 @@ package com.dropbaba.auth_service.service;
 
 import com.dropbaba.auth_service.dto.AuthRequest;
 import com.dropbaba.auth_service.dto.AuthResponse;
+import com.dropbaba.auth_service.dto.LoginRequest;
 import com.dropbaba.auth_service.entity.Role;
 import com.dropbaba.auth_service.entity.User;
 import com.dropbaba.auth_service.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -69,4 +71,34 @@ class AuthServiceTest {
         assertEquals("fake-jwt-token", response.getAccessToken());
         verify(userRepository, times(1)).save(any(User.class));
     }
+
+    @Test
+    void shouldLoginSuccessfullyWithEmail() {
+        LoginRequest request = LoginRequest.builder()
+                .emailOrPhone("wajahat@example.com")
+                .password("password")
+                .build();
+
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .name("Wajahat")
+                .email("wajahat@example.com")
+                .phone("03331234567")
+                .password("hashed-password")
+                .role(Role.USER)
+                .enabled(true)
+                .build();
+
+        when(userRepository.findByEmailOrPhone(request.getEmailOrPhone(), request.getEmailOrPhone()))
+                .thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(request.getPassword(), user.getPassword())).thenReturn(true);
+        when(jwtUtil.generateToken(any(User.class))).thenReturn("test-token");
+
+        AuthResponse response = authService.login(request);
+
+        assertNotNull(response);
+        assertEquals("test-token", response.getAccessToken());
+        verify(userRepository, times(1)).findByEmailOrPhone(any(), any());
+    }
+
 }

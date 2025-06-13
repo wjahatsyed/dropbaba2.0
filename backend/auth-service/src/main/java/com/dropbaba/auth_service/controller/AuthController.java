@@ -2,6 +2,7 @@ package com.dropbaba.auth_service.controller;
 
 import com.dropbaba.auth_service.dto.AuthRequest;
 import com.dropbaba.auth_service.dto.AuthResponse;
+import com.dropbaba.auth_service.dto.LoginRequest;
 import com.dropbaba.auth_service.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,4 +19,10 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
+    }
+
 }
