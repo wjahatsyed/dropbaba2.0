@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+backend/auth-service/src/main/resources/application-secrets.yml
+
